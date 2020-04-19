@@ -1,16 +1,32 @@
 import React from 'react'
 import ReactMapGL from 'react-map-gl'
-// import axios from 'axios'
+import axios from 'axios'
 import 'mapbox-gl/dist/mapbox-gl.css'
 const mapboxToken = process.env.REACT_APP_MAPBOX_TOKEN
 
 
 class Map extends React.Component {
   state = {
+    countries: [],
     viewport: {
       longitude: 0,
       latitude: 0,
-      zoom: 1.1
+      zoom: 1.2
+    }
+  }
+
+  async componentDidMount() {
+    try {
+      const response = await axios.get(
+        'https://bing.com/covid/data'
+      )
+      this.setState({
+        countries: response.data.filter(country => {
+          return (country.City.length >= 0)
+        })
+      })
+    } catch (err) {
+      console.log(err)
     }
   }
 
@@ -21,6 +37,7 @@ class Map extends React.Component {
   }
 
   render() {
+    console.log(this.state.countries)
     const { viewport } = this.state
     return (
       <ReactMapGL
@@ -32,6 +49,11 @@ class Map extends React.Component {
         onViewportChange={this.handleViewportChange}
         maxZoom={13}
       >
+        {/* {this.state.countries.map(places => (
+          <Marker>
+            <p>{places.city}</p>
+          </Marker>
+        ))} */}
       </ReactMapGL>
     )
   }
