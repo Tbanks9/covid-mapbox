@@ -17,13 +17,11 @@ class Map extends React.Component {
 
   async componentDidMount() {
     try {
-      const response = await axios.get(
-        'https://bing.com/covid/data'
+      const res = await axios.get(
+        '/data'
       )
       this.setState({
-        countries: response.data.filter(country => {
-          return (country.City.length >= 0)
-        })
+        countries: res.data
       })
     } catch (err) {
       console.log(err)
