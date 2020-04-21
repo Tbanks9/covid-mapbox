@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactMapGL from 'react-map-gl'
+import ReactMapGL, { Marker } from 'react-map-gl'
 import axios from 'axios'
 import 'mapbox-gl/dist/mapbox-gl.css'
 const mapboxToken = process.env.REACT_APP_MAPBOX_TOKEN
@@ -8,9 +8,8 @@ const mapboxToken = process.env.REACT_APP_MAPBOX_TOKEN
 class Map extends React.Component {
   state = {
     countries: [],
+    areas: [],
     viewport: {
-      longitude: 0,
-      latitude: 0,
       zoom: 1.2
     }
   }
@@ -21,8 +20,9 @@ class Map extends React.Component {
         '/data'
       )
       this.setState({
-        countries: res.data
+        countries: res.data, areas: res.data.areas
       })
+      console.log(this.state.areas)
     } catch (err) {
       console.log(err)
     }
@@ -35,8 +35,7 @@ class Map extends React.Component {
   }
 
   render() {
-    console.log(this.state.countries)
-    const { viewport } = this.state
+    const { viewport, areas } = this.state
     return (
       <ReactMapGL
         mapboxApiAccessToken={mapboxToken}
@@ -47,11 +46,15 @@ class Map extends React.Component {
         onViewportChange={this.handleViewportChange}
         maxZoom={13}
       >
-        {/* {this.state.countries.map(places => (
-          <Marker>
-            <p>{places.city}</p>
+        {areas.map((places, item) => (
+          <Marker
+            key={item}
+            latitude={places.lat}
+            longitude={places.long}
+          >
+            <p>{places.displayName}</p>
           </Marker>
-        ))} */}
+        ))}
       </ReactMapGL>
     )
   }
