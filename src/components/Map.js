@@ -20,14 +20,14 @@ class Map extends React.Component {
         '/data'
       )
       this.setState({
-        countries: res.data, areas: res.data.areas
+        total: res.data, countries: res.data.areas
       })
-      console.log(this.state.areas)
+      console.log(this.state.countries)
     } catch (err) {
       console.log(err)
     }
   }
-
+  
   handleViewportChange = viewport => {
     this.setState({
       viewport: { ...this.state.viewport, ...viewport }
@@ -35,7 +35,8 @@ class Map extends React.Component {
   }
 
   render() {
-    const { viewport, areas } = this.state
+    const { viewport, countries, total } = this.state
+    console.log(total)
     return (
       <ReactMapGL
         mapboxApiAccessToken={mapboxToken}
@@ -46,13 +47,25 @@ class Map extends React.Component {
         onViewportChange={this.handleViewportChange}
         maxZoom={13}
       >
-        {areas.map((places, item) => (
+        {/* {Object.values(this.state.total).map((item) => 
+        <div>{item.totalConfirmed}</div>
+        )} */}
+        {countries.map((places, item) => (
           <Marker
             key={item}
             latitude={places.lat}
             longitude={places.long}
           >
             <p>{places.displayName}</p>
+            {places.areas.map((sub, item) =>
+              <Marker
+                key={item}
+                latitude={sub.lat}
+                longitude={sub.long}
+              >
+                {sub.displayName}
+              </Marker>
+            )}
           </Marker>
         ))}
       </ReactMapGL>
