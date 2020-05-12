@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactMapGL, { Marker } from 'react-map-gl'
+import ReactMapGL from 'react-map-gl'
 import axios from 'axios'
 import 'mapbox-gl/dist/mapbox-gl.css'
 const mapboxToken = process.env.REACT_APP_MAPBOX_TOKEN
@@ -7,8 +7,7 @@ const mapboxToken = process.env.REACT_APP_MAPBOX_TOKEN
 
 class Map extends React.Component {
   state = {
-    countries: [],
-    areas: [],
+    total: [],
     viewport: {
       zoom: 1.2
     }
@@ -17,12 +16,14 @@ class Map extends React.Component {
   async componentDidMount() {
     try {
       const res = await axios.get(
-        '/data'
+        '/v2/countries'
       )
       this.setState({
-        total: res.data, countries: res.data.areas
+        total: res.data.map(info => {
+          return (info.countryInfo)
+        })
       })
-      console.log(this.state.countries)
+      console.log(this.state.total)
     } catch (err) {
       console.log(err)
     }
@@ -35,7 +36,7 @@ class Map extends React.Component {
   }
 
   render() {
-    const { viewport, countries, total } = this.state
+    const { viewport, total } = this.state
     console.log(total)
     return (
       <ReactMapGL
@@ -47,29 +48,35 @@ class Map extends React.Component {
         onViewportChange={this.handleViewportChange}
         maxZoom={13}
       >
-        {/* {Object.values(this.state.total).map((item) => 
-        <div>{item.totalConfirmed}</div>
-        )} */}
-        {countries.map((places, item) => (
-          <Marker
-            key={item}
-            latitude={places.lat}
-            longitude={places.long}
-          >
-            <p>{places.displayName}</p>
-            {places.areas.map((sub, item) =>
-              <Marker
-                key={item}
-                latitude={sub.lat}
-                longitude={sub.long}
-              >
-                {sub.displayName}
-              </Marker>
-            )}
-          </Marker>
+        {total.map(places => (
+          <p>{places.country}</p>
+            // {/* <p>{places.country}</p> */}
+            // {/* {places.countryInfo.map((sub, item) =>
+            //   <Marker
+            //     key={item}
+            //     latitude={sub.lat}
+            //     longitude={sub.long}
+            //   >
+            //     {sub.country}
+            //   </Marker>
+            // )} */}
         ))}
       </ReactMapGL>
     )
   }
 }
 export default Map
+
+// async componentDidMount() {
+//   try {
+//     const res = await axios.get(
+//       '/microsoft/Bing-COVID-19-Data/master/data/Bing-COVID19-Data.csv'
+//     )
+//     this.setState({
+//       total: res.data, countries: res.data.areas
+//     })
+//     console.log(this.state.countries)
+//   } catch (err) {
+//     console.log(err)
+//   }
+// }
